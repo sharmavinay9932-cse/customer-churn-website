@@ -30,7 +30,7 @@
 
 The project is deployed and available online:
 
-### 👉 [Open ChurnAI](YOUR-RENDER-URL)
+### 👉 [Open ChurnAI](https://customer-churn-website.onrender.com)
 
 
 
