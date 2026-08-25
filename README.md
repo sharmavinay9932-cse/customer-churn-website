@@ -32,7 +32,7 @@ The project is deployed and available online:
 
 ### 👉 [Open ChurnAI](YOUR-RENDER-URL)
 
-> Replace `YOUR-RENDER-URL` with the Web Service URL shown in your Render dashboard.
+
 
 ---
 
