@@ -1,12 +1,26 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-
-from model import predict_customer, get_model_info
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 
 from model import predict_customer, get_model_info
 from ai import generate_retention_strategy
+
+import os
+
+
+# =========================================================
+# PATHS
+# =========================================================
+
+BASE_DIR = os.path.dirname(
+    os.path.dirname(
+        os.path.abspath(__file__)
+    )
+)
+
+FRONTEND_DIR = os.path.join(
+    BASE_DIR,
+    "frontend"
+)
 
 
 # =========================================================
@@ -19,16 +33,37 @@ CORS(app)
 
 
 # =========================================================
-# HOME
+# FRONTEND
 # =========================================================
 
 @app.route("/", methods=["GET"])
 def home():
 
-    return jsonify({
-        "message": "Customer Churn Prediction API",
-        "status": "running"
-    })
+    return send_from_directory(
+        FRONTEND_DIR,
+        "index.html"
+    )
+
+
+@app.route("/<path:path>", methods=["GET"])
+def frontend_files(path):
+
+    file_path = os.path.join(
+        FRONTEND_DIR,
+        path
+    )
+
+    if os.path.isfile(file_path):
+
+        return send_from_directory(
+            FRONTEND_DIR,
+            path
+        )
+
+    return send_from_directory(
+        FRONTEND_DIR,
+        "index.html"
+    )
 
 
 # =========================================================
@@ -93,9 +128,16 @@ def predict():
                 "error": "No customer data provided"
             }), 400
 
-        result = predict_customer(data)
 
-        return jsonify(result)
+        result = predict_customer(
+            data
+        )
+
+
+        return jsonify(
+            result
+        )
+
 
     except Exception as e:
 
@@ -104,9 +146,6 @@ def predict():
         }), 500
 
 
-# =========================================================
-# RUN SERVER
-# =========================================================
 # =========================================================
 # AI RETENTION STRATEGY
 # =========================================================
@@ -119,29 +158,45 @@ def ai_analysis():
         data = request.get_json()
 
         if not data:
+
             return jsonify({
                 "error": "No customer data provided"
             }), 400
 
-        customer = data.get("customer")
-        prediction = data.get("prediction")
+
+        customer = data.get(
+            "customer"
+        )
+
+        prediction = data.get(
+            "prediction"
+        )
+
 
         if not customer:
+
             return jsonify({
                 "error": "Customer data is required"
             }), 400
 
+
         if not prediction:
+
             return jsonify({
                 "error": "Prediction data is required"
             }), 400
+
 
         result = generate_retention_strategy(
             customer,
             prediction
         )
 
-        return jsonify(result)
+
+        return jsonify(
+            result
+        )
+
 
     except Exception as e:
 
@@ -149,6 +204,12 @@ def ai_analysis():
             "available": False,
             "message": str(e)
         }), 500
+
+
+# =========================================================
+# RUN SERVER
+# =========================================================
+
 if __name__ == "__main__":
 
     app.run(
